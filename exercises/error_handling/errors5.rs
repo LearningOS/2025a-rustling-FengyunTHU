@@ -16,20 +16,21 @@
 // exercise, that context is the potential errors which can be returned in a
 // Result.
 //
+//这个程序使用了errors4中代码的修改版本。////这个练习使用了一些我们在//课程后面才会用到的概念，比如“Box”和“From”特征。现在详细理解它们并不重要，但是如果你愿意，你可以继续往下读。现在，想想“盒子< dyn？？？>`键入“我想要任何有用的东西？？?"类型，//考虑到Rust通常的运行时安全标准，您应该会觉得//有些宽松！////简而言之，盒子的这个特殊用例是当你想拥有一个//值，并且你只关心它是一个实现特殊//特征的类型时使用的。为此，将Box声明为Box<dyn Trait >类型，其中Trait是//编译器在该上下文中使用的任何值上查找的Trait。对于这个//练习，上下文是可能在//结果中返回的潜在错误。////我们可以用什么来描述这两个错误？换句话说，有没有一个特质//两个错误都实现了？
 // What can we use to describe both errors? In other words, is there a trait
 // which both errors implement?
 //
 // Execute `rustlings hint errors5` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 use std::error;
 use std::fmt;
 use std::num::ParseIntError;
 
 // TODO: update the return type of `main()` to make this compile.
-fn main() -> Result<(), Box<dyn ???>> {
+fn main() -> Result<(), Box<dyn error::Error>> { // 一个包括所有的error的错误，抽象层次最高
     let pretend_user_input = "42";
     let x: i64 = pretend_user_input.parse()?;
     println!("output={:?}", PositiveNonzeroInteger::new(x)?);

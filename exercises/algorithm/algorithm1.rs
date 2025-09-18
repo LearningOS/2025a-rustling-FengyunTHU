@@ -1,6 +1,8 @@
 /*
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
+    单链表合并
+    这个问题要求你将两个有序单链表合并成一个有序单链表
 */
 // I AM NOT DONE
 
@@ -70,12 +72,64 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    where
+        T: Default+PartialOrd+Copy
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        // 在lista的结尾添加指向listb开头的指针
+        // if let Some(end_ptr_a) = list_a.end { // 使用iflet处理
+        //     unsafe{ (*end_ptr_a.as_ptr()).next = list_b.start;}
+        // };
+        match list_a.end {
+            Some(end_ptr_a) => unsafe{(*end_ptr_a.as_ptr()).next = list_b.start;},
+            None => (),
+        };
+		let mut linklist_no_sort = Self {
+            length: list_a.length+list_b.length,
+            start: list_a.start,
+            end: list_b.end,
+        };
+        // 对链表做排序->从小到大
+        let T_default = T::default();
+        let mut node_ori = Box::new(Node::new(T_default)); // 创建一个空的起始节点
+        node_ori.next = None;
+        let node_ptr_ori = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_ori)) }); // 这里nodeori已经被释放
+        let mut end_ptr = node_ptr_ori;
+        for i in 0..linklist_no_sort.length {
+            let mut node_now = Box::new(Node::new(T_default));
+            match linklist_no_sort.get(i as i32) {
+                Some(value) => node_now = Box::new(Node::new(*value)),
+                None => ()
+            };
+            node_now.next = None;
+            let mut current_ptr = node_ptr_ori;
+            let mut former_ptr = node_ptr_ori;
+            loop {
+                match unsafe{(*current_ptr.unwrap().as_ptr()).next} {
+                    None => unsafe{
+                        (*current_ptr.unwrap().as_ptr()).next = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_now)) }); // 插入i节点
+                        // 记录终止节点
+                        end_ptr = (*current_ptr.unwrap().as_ptr()).next;
+                        break;
+                    }
+                    Some(next_ptr) => unsafe{
+                        if node_now.val > (*next_ptr.as_ptr()).val {
+                            former_ptr = current_ptr;
+                            current_ptr = Some(next_ptr);
+                        } else {
+                            // 执行插入操作
+                            node_now.next = current_ptr;
+                            (*former_ptr.unwrap().as_ptr()).next = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_now)) });
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        Self {
+            length: linklist_no_sort.length,
+            start: unsafe { (*node_ptr_ori.unwrap().as_ptr()).next },
+            end: end_ptr,
         }
 	}
 }

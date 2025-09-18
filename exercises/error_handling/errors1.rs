@@ -6,17 +6,20 @@
 // construct to `Result` that can be used to express error conditions. Let's use
 // it!
 //
+//如果您传递一个空字符串，该函数拒绝生成要打印在名称标签上的文本。如果能解释问题是什么就更好了，而不是有时只返回“没有”。幸运的是，Rust有一个类似于“Result”的结构，可以用来表示错误情况。还是用吧！
 // Execute `rustlings hint errors1` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
-pub fn generate_nametag_text(name: String) -> Option<String> {
+pub fn generate_nametag_text(name: String) -> Result<String,String> { // 返回一个Result类型
     if name.is_empty() {
         // Empty names aren't allowed.
-        None
+        // None
+        Err("`name` was empty; it must be nonempty.".into())
     } else {
-        Some(format!("Hi! My name is {}", name))
+        // Some
+        Ok(format!("Hi! My name is {}", name))
     }
 }
 

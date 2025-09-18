@@ -9,12 +9,15 @@
 // table is to use a Hashmap. The solution is partially written to use a
 // Hashmap, complete it to pass the test.
 //
+//给出一场足球比赛的分数列表(每行一个)。每一行都是的形式:" <球队_ 1 _名称>，<球队_ 2 _名称>，<球队_ 1 _进球>，<球队_ 2 _进球> "
+// 例:英格兰，法国，4，2(英格兰进4球，法国2)。
+//您必须建立一个分数表，其中包含球队名称、球队得分以及球队失球。构建scores表的一种方法是使用散列表。解决方案的一部分是使用Hashmap编写的，完成它才能通过测试。
 // Make me pass the tests!
 //
 // Execute `rustlings hint hashmaps3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 use std::collections::HashMap;
 
@@ -39,6 +42,38 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // will be the number of goals conceded from team_2, and similarly
         // goals scored by team_2 will be the number of goals conceded by
         // team_1.
+        let team1_new = Team {
+            goals_scored:team_1_score,
+            goals_conceded:team_2_score,
+        };
+        let team2_new = Team {
+            goals_scored:team_2_score,
+            goals_conceded:team_1_score,
+        };
+        let team_1_names = team_1_name.clone();
+        let team_2_names = team_2_name.clone();
+        // Term1部分
+        match scores.entry(team_1_names) {
+            std::collections::hash_map::Entry::Occupied(mut Team_Score) => {
+                let mut TeamNow = scores.entry(team_1_name).or_insert(team1_new);
+                TeamNow.goals_scored+=team_1_score;
+                TeamNow.goals_conceded+=team_2_score;
+            },
+            std::collections::hash_map::Entry::Vacant(Team_Score) => {
+                scores.entry(team_1_name).or_insert(team1_new);
+            },
+        };
+        // Term2部分
+        match scores.entry(team_2_names) {
+            std::collections::hash_map::Entry::Occupied(mut Team_Score) => {
+                let mut TeamNow = scores.entry(team_2_name).or_insert(team2_new);
+                TeamNow.goals_scored+=team_2_score;
+                TeamNow.goals_conceded+=team_1_score;
+            },
+            std::collections::hash_map::Entry::Vacant(Team_Score) => {
+                scores.entry(team_2_name).or_insert(team2_new);
+            },
+        };
     }
     scores
 }
