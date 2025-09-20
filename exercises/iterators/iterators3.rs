@@ -9,7 +9,7 @@
 // Execute `rustlings hint iterators3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DivisionError {
@@ -25,24 +25,43 @@ pub struct NotDivisibleError {
 
 // Calculate `a` divided by `b` if `a` is evenly divisible by `b`.
 // Otherwise, return a suitable error.
+//如果‘a’能被‘b’整除，则计算‘a’除以‘b’。//否则，返回适当的错误。
 pub fn divide(a: i32, b: i32) -> Result<i32, DivisionError> {
-    todo!();
+    // todo!();
+    if b == 0 {
+        Err(DivisionError::DivideByZero)
+    } else if a%b == 0 {
+        Ok(a/b as i32)
+    } else {
+        Err(DivisionError::NotDivisible(NotDivisibleError{dividend:a,divisor:b}))
+    }
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: Ok([1, 11, 1426, 3])
-fn result_with_list() -> () {
+fn result_with_list() -> Result<Vec<i32>, DivisionError> {
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    let division_results:Vec<Result<i32, DivisionError>> = numbers.into_iter().map(|n| divide(n, 27)).collect(); // 一个其中为Result类型的数组->如果直接在这里将其解存储为值或者错误，无法在一个list中收集，类型不一样(无法在闭包中进行)
+    // let c = division_results.into_iter().map(|x| if let Ok(y) = x {y}).collect();
+    // Ok(c)
+    let mut Right_List:Vec<i32> = Vec::new();
+    for itp in division_results {
+        match itp {
+            Err(e) => return Err(e), // 闭包无法返回，在这里不使用闭包函数，依次push，直接返回
+            Ok(x) => Right_List.push(x),
+        };
+    }
+    Ok(Right_List)
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: [Ok(1), Ok(11), Ok(1426), Ok(3)]
-fn list_of_results() -> () {
+fn list_of_results() -> Vec<Result<i32, DivisionError>> { // 动态数组在输出的时候也是有[]表示的
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    let division_results:Vec<Result<i32, DivisionError>> = numbers.into_iter().map(|n| divide(n, 27)).collect(); // 惰性收集器需要collect
+    division_results
 }
 
 #[cfg(test)]

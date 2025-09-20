@@ -3,7 +3,7 @@
 // The From trait is used for value-to-value conversions. If From is implemented
 // correctly for a type, the Into trait should work conversely. You can read
 // more about it at https://doc.rust-lang.org/std/convert/trait.From.html
-//
+//From特征用于值到值的转换。如果From为一个类型正确地实现了//，那么Into特征应该反过来工作。你可以在https://doc.rust-lang.org/std/convert/trait.From.html了解更多
 // Execute `rustlings hint from_into` or use the `hint` watch subcommand for a
 // hint.
 
@@ -39,11 +39,43 @@ impl Default for Person {
 //    `usize` as the age.
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
-
-// I AM NOT DONE
+//您的任务是完成这个实现，以便编译“let p =// Person::from("Mark，20 ")”行。请注意，您需要将// age组件解析为类似于“4”的“usize”。解析::< usize >()`。//这种结果需要妥善处理。////步骤:// 1。如果提供的字符串长度为0，则返回默认值// Person。// 2.根据逗号分割给定的字符串。// 3.从split操作中提取第一个元素，并将其用作名称。// 4.如果姓名为空，则返回缺省的Person。// 5.从split操作中提取另一个元素，并将其解析为// `usize '作为年龄。//如果解析年龄时出错，则返回默认值//Person；否则，返回实例化的Person对象和结果
+// I AM DONE
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.len() == 0 {
+            Person::default()
+        } else {
+            let int_v:Vec<&str> = s.split(",").collect();
+            // let Name:&str = &int_v[0];
+            if int_v.len() >= 3 {
+                Person::default()
+            } else {
+                match int_v.get(0) {
+                    None => Person::default(),
+                    Some(&Name) => { // 这里内部为&str，使用match解引用后得到Option<&T>即Option<&&str>，需要用Some(&T)匹配出&str
+                        if Name.len() == 0 {
+                            Person::default()
+                        } else {
+                            // let mut age_raw:&str = &int_v[1];
+                            match int_v.get(1) {
+                                None => Person::default(),
+                                Some(&age_raw) => {
+                                        match age_raw.parse::<usize>() {
+                                        Err(e) => Person::default(),
+                                        Ok(age_) => Person {
+                                            name: String::from(Name),
+                                            age: age_
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

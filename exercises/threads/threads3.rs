@@ -3,7 +3,7 @@
 // Execute `rustlings hint threads3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 use std::sync::mpsc;
 use std::sync::Arc;
@@ -29,20 +29,24 @@ impl Queue {
 fn send_tx(q: Queue, tx: mpsc::Sender<u32>) -> () {
     let qc = Arc::new(q);
     let qc1 = Arc::clone(&qc);
-    let qc2 = Arc::clone(&qc);
+    let qc2 = Arc::clone(&qc); // 指向同一个qc，是不可变引用
+    // 同样使用Arc创建多线程使用->多线程用Arc即可
+    let txc = Arc::new(tx);
+    let txc1 = Arc::clone(&txc);
+    let txc2 = Arc::clone(&txc);
 
     thread::spawn(move || {
-        for val in &qc1.first_half {
+        for val in &qc1.first_half { // qc1和tx的使用权转移
             println!("sending {:?}", val);
-            tx.send(*val).unwrap();
+            txc1.send(*val).unwrap();
             thread::sleep(Duration::from_secs(1));
         }
     });
 
     thread::spawn(move || {
-        for val in &qc2.second_half {
+        for val in &qc2.second_half { // qc2和tx的使用权转移，但是tx已经转移过了
             println!("sending {:?}", val);
-            tx.send(*val).unwrap();
+            txc2.send(*val).unwrap();
             thread::sleep(Duration::from_secs(1));
         }
     });

@@ -8,10 +8,12 @@
 // Only the two iterator methods (count_iterator and count_collection_iterator)
 // need to be modified.
 //
+//让我们定义一个简单的模型来跟踪生锈的练习进度。进度//将使用散列图建模。练习的名称是关键，而//进度是价值。创建了两个计数函数来计算给定进度下的//次练习。使用迭代器重新创建计数//功能。尽量不要使用命令式循环(for，while)。//只有两个迭代器方法(count_iterator和count_collection_iterator)//需要修改。//
+
 // Execute `rustlings hint iterators5` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 use std::collections::HashMap;
 
@@ -35,7 +37,20 @@ fn count_for(map: &HashMap<String, Progress>, value: Progress) -> usize {
 fn count_iterator(map: &HashMap<String, Progress>, value: Progress) -> usize {
     // map is a hashmap with String keys and Progress values.
     // map = { "variables1": Complete, "from_str": None, ... }
-    todo!();
+    // todo!();
+    let mut count = 0;
+    let mut val = map.values(); // 自身就是迭代器
+    loop {
+        match val.next() {
+            Some(progress) => {
+                if progress == &value {
+                    count += 1;
+                }
+            },
+            None => break,
+        };
+    }
+    count
 }
 
 fn count_collection_for(collection: &[HashMap<String, Progress>], value: Progress) -> usize {
@@ -54,7 +69,28 @@ fn count_collection_iterator(collection: &[HashMap<String, Progress>], value: Pr
     // collection is a slice of hashmaps.
     // collection = [{ "variables1": Complete, "from_str": None, ... },
     //     { "variables2": Complete, ... }, ... ]
-    todo!();
+    // todo!();
+    let mut count = 0;
+    let mut itr_outer = collection.iter();
+    loop {
+        match itr_outer.next() {
+            Some(hasp) => {
+                let mut itr_inner = hasp.values();
+                loop {
+                    match itr_inner.next() {
+                        Some(progress) => {
+                            if progress == &value {
+                                count += 1;
+                            }
+                        },
+                        None => break,
+                    };
+                }
+            },
+            None => break,
+        };
+    }
+    count
 }
 
 #[cfg(test)]
