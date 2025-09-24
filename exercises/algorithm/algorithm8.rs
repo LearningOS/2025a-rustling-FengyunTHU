@@ -1,8 +1,8 @@
 /*
 	queue
-	This question requires you to use queues to implement the functionality of the stac
+	This question requires you to use queues to implement the functionality of the stack// 使用队列实现stack功能
 */
-// I AM NOT DONE
+// I AM DONE
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -52,7 +52,7 @@ impl<T> Default for Queue<T> {
     }
 }
 
-pub struct myStack<T>
+pub struct myStack<T> // 压入栈后出栈的元素在队列尾部，需要将前面的元素全部pop出来并压入队列2
 {
 	//TODO
 	q1:Queue<T>,
@@ -68,14 +68,57 @@ impl<T> myStack<T> {
     }
     pub fn push(&mut self, elem: T) {
         //TODO
+        if self.is_empty() {
+            self.q1.enqueue(elem);
+        } else {
+            if self.q1.is_empty() { // 此时队列在q2中
+                self.q2.enqueue(elem);
+            } else {
+                self.q1.enqueue(elem);
+            }
+        }
     }
     pub fn pop(&mut self) -> Result<T, &str> {
         //TODO
-		Err("Stack is empty")
+        if self.is_empty() {
+            return Err("Stack is empty");
+        } else {
+            if self.q1.is_empty() { // 队列在q2中
+                let mut count = self.q2.size();
+                loop {
+                    if let Ok(elec) = self.q2.dequeue() {
+                        if count > 1 {
+                            self.q1.enqueue(elec);
+                        } else {
+                            return Ok(elec);
+                        }
+                    };
+                    count-=1;
+                }
+                // self.q2.dequeue()
+            } else {
+                let mut count = self.q1.size();
+                loop {
+                    if let Ok(elec) = self.q1.dequeue() {
+                        if count > 1 {
+                            self.q2.enqueue(elec);
+                        } else {
+                            return Ok(elec);
+                        }
+                    };
+                    count-=1;
+                }
+                // self.q1.dequeue()
+            }
+        }
     }
     pub fn is_empty(&self) -> bool {
 		//TODO
-        true
+        if self.q1.is_empty() && self.q2.is_empty() {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

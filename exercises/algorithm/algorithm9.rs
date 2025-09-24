@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+// I AM DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -24,7 +24,7 @@ where
         Self {
             count: 0,
             items: vec![T::default()],
-            comparator,
+            comparator, // 比较函数->表达优先级->优先级高为父节点
         }
     }
 
@@ -38,6 +38,20 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        if self.count == 0 { // 用于初始化的类型->很奇怪
+            self.items.clear();
+        }
+        self.items.push(value);
+        self.count+=1;
+        if self.count >= 2 {
+            // 执行交换操作
+            let mut current_index = self.count;
+            // let mut vec_list = &mut self.items; // &vec<T>
+            while current_index >= 2 && (self.comparator)(&self.items[current_index-1],&self.items[self.parent_idx(current_index)-1]) {
+                self.items.swap(current_index-1,current_index/2-1);
+                current_index = current_index/2;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +72,19 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		// 返回两个子节点中更优先的那个
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = left_idx + 1;
+        if right_idx > self.count {
+            return left_idx; // 只有一个节点
+        } else {
+            let target:bool = (self.comparator)(&self.items[left_idx-1],&self.items[right_idx-1]);
+            if target {
+                return left_idx;
+            } else {
+                return right_idx;
+            }
+        }
     }
 }
 
@@ -85,7 +111,33 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        //不使用vec的迭代器，手动声明->堆需要每次弹出根节点
+        // return Some(self.items.remove(0));
+        if self.is_empty() {
+            return None;
+        } else {
+            // 下沉调整
+            let root = self.items.remove(0);
+            self.count-=1;
+            match self.items.pop() {
+                None => {return Some(root);}
+                Some(value) => {
+                    self.items.push(value); // 将底部的元素放在顶部->下沉调整
+                    let mut current_index = 1;
+                    while self.children_present(current_index) { // 子节点存在
+                        // 选取子节点中更优先的进行交换
+                        let better_child_idx = self.smallest_child_idx(current_index);
+                        if (self.comparator)(&self.items[better_child_idx-1],&self.items[current_index-1]) {
+                            self.items.swap(better_child_idx-1,current_index-1);
+                        } else {
+                            break;
+                        }
+                        current_index = better_child_idx;
+                    }
+                    return Some(root);
+                }
+            }
+        }
     }
 }
 

@@ -4,7 +4,7 @@
     单链表合并
     这个问题要求你将两个有序单链表合并成一个有序单链表
 */
-// I AM NOT DONE
+// I AM DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -91,44 +91,51 @@ impl<T> LinkedList<T> {
         };
         // 对链表做排序->从小到大
         let T_default = T::default();
-        let mut node_ori = Box::new(Node::new(T_default)); // 创建一个空的起始节点
+        let mut node_ori = Box::new(Node::new(T_default)); // 创建一个空的起始节点->可以智能解引用
         node_ori.next = None;
-        let node_ptr_ori = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_ori)) }); // 这里nodeori已经被释放
-        let mut end_ptr = node_ptr_ori;
+        let node_ptr_ori = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_ori)) }); // 这里nodeori已经被释放->一个指向新节点的指针（空指针需要unsafe）->一个非空的裸指针（Some可以处理为空的情况）
+        let mut end_ptr = Some(unsafe {NonNull::new_unchecked(Box::into_raw(Box::new(Node::new(T_default))))}); // 指针应当在栈上会复制
         for i in 0..linklist_no_sort.length {
             let mut node_now = Box::new(Node::new(T_default));
-            match linklist_no_sort.get(i as i32) {
-                Some(value) => node_now = Box::new(Node::new(*value)),
-                None => ()
-            };
+            // match linklist_no_sort.get(i as i32) {
+            //     Some(value) => node_now = Box::new(Node::new(*value)),
+            //     None => ()
+            // };
+            if let Some(value) = linklist_no_sort.get(i as i32) {
+                node_now.val = *value; // 这里返回的是&T
+            }
             node_now.next = None;
             let mut current_ptr = node_ptr_ori;
-            let mut former_ptr = node_ptr_ori;
+            let ptr_now = Some(unsafe {NonNull::new_unchecked(Box::into_raw(node_now))}); // 指向现在节点的指针
+            // let mut former_ptr = node_ptr_ori;
             loop {
                 match unsafe{(*current_ptr.unwrap().as_ptr()).next} {
                     None => unsafe{
-                        (*current_ptr.unwrap().as_ptr()).next = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_now)) }); // 插入i节点
+                        (*current_ptr.unwrap().as_ptr()).next = ptr_now; // 插入i节点
                         // 记录终止节点
                         end_ptr = (*current_ptr.unwrap().as_ptr()).next;
                         break;
                     }
-                    Some(next_ptr) => unsafe{
-                        if node_now.val > (*next_ptr.as_ptr()).val {
-                            former_ptr = current_ptr;
-                            current_ptr = Some(next_ptr);
-                        } else {
+                    Some(next_ptr) => unsafe {
+                        // 不断迭代找到插入操作
+                        // next_ptr是Option<NonNull<Node<T>>>类型
+                        // 如果比现在的值小，则需要后移；刚好比现在的值大，则插入
+                        if (*next_ptr.as_ptr()).val >= (*ptr_now.unwrap().as_ptr()).val {
                             // 执行插入操作
-                            node_now.next = current_ptr;
-                            (*former_ptr.unwrap().as_ptr()).next = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node_now)) });
+                            (*current_ptr.unwrap().as_ptr()).next = ptr_now;
+                            (*ptr_now.unwrap().as_ptr()).next = Some(next_ptr);
                             break;
+                        } else {
+                            // 将current向后移位
+                            current_ptr = (*current_ptr.unwrap().as_ptr()).next;
                         }
                     }
-                }
+                };
             }
         }
         Self {
             length: linklist_no_sort.length,
-            start: unsafe { (*node_ptr_ori.unwrap().as_ptr()).next },
+            start: unsafe{(*node_ptr_ori.unwrap().as_ptr()).next},
             end: end_ptr,
         }
 	}

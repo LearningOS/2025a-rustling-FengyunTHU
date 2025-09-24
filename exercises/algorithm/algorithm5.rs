@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic BFS algorithm
 */
 
-//I AM NOT DONE
+//I AM DONE
 use std::collections::VecDeque;
 
 // Define a graph
@@ -12,7 +12,7 @@ struct Graph {
 }
 
 impl Graph {
-    // Create a new graph with n vertices
+    // Create a new graph with n vertices->n个节点
     fn new(n: usize) -> Self {
         Graph {
             adj: vec![vec![]; n],
@@ -29,8 +29,31 @@ impl Graph {
     fn bfs_with_return(&self, start: usize) -> Vec<usize> {
         
 		//TODO
-
-        let mut visit_order = vec![];
+        let mut search_from:Vec<usize> = vec![start];
+        let mut visit_order = vec![start];
+        // 检查所有的搜索到的节点是不是在集合中->用队列更合理
+        loop {
+            let mut search_to = vec![];
+            for start_index in &search_from {
+                for to_index in &self.adj[*start_index] {
+                    if !search_to.contains(to_index) {
+                        search_to.push(*to_index);
+                    }
+                }
+            }
+            let mut target:bool = true;
+            search_from.clear();
+            for posi in &search_to {
+                if !visit_order.contains(posi) {
+                    visit_order.push(*posi);
+                    search_from.push(*posi);
+                    target = false;
+                }
+            }
+            if target {
+                break;
+            }
+        }
         visit_order
     }
 }

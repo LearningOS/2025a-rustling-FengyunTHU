@@ -3,7 +3,7 @@
 	This question requires you to use a stack to achieve a bracket match
 */
 
-// I AM NOT DONE
+// I AM DONE
 #[derive(Debug)]
 struct Stack<T> {
 	size: usize,
@@ -32,7 +32,11 @@ impl<T> Stack<T> {
 	}
 	fn pop(&mut self) -> Option<T> {
 		// TODO
-		None
+		if 0 == self.size {
+            return None;
+        }
+        self.size = self.size - 1;
+        self.data.pop() // 返回栈顶的元素
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
@@ -102,7 +106,55 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 fn bracket_match(bracket: &str) -> bool
 {
 	//TODO
-	true
+    // 使用栈来操作，注意是左侧括号进栈，然后与右侧的比对出栈
+    // 创建一个栈
+    let mut stack_t:Stack<char> = Stack::new();
+    for char_index in bracket.chars() {
+        if char_index == '(' || char_index == '[' || char_index == '{' {
+            stack_t.push(char_index);
+        }
+        if char_index == ')' {
+            match stack_t.peek() {
+                None => {return false}
+                Some(char_p) => {
+                    if *char_p != '(' {
+                        return false;
+                    } else {
+                        stack_t.pop();
+                    }
+                }
+            }
+        }
+        if char_index == ']' {
+            match stack_t.peek() {
+                None => {return false}
+                Some(char_p) => {
+                    if *char_p != '[' {
+                        return false;
+                    } else {
+                        stack_t.pop();
+                    }
+                }
+            }
+        }
+        if char_index == '}' {
+            match stack_t.peek() {
+                None => {return false}
+                Some(char_p) => {
+                    if *char_p != '{' {
+                        return false;
+                    } else {
+                        stack_t.pop();
+                    }
+                }
+            }
+        }
+    }
+    // 最后结束检查栈是否为空
+    if !stack_t.is_empty() {
+        return false;
+    }
+    return true;
 }
 
 #[cfg(test)]

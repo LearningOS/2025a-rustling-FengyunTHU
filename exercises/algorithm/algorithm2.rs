@@ -1,8 +1,8 @@
 /*
 	double linked list reverse
-	This problem requires you to reverse a doubly linked list
+	This problem requires you to reverse a doubly linked list // 翻转双向链表
 */
-// I AM NOT DONE
+// I AM DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -72,8 +72,43 @@ impl<T> LinkedList<T> {
             },
         }
     }
+
+    // 返回节点处Node节点的函数
+    fn get_ith_node_self(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<NonNull<Node<T>>> {
+        match node {
+            None => None,
+            Some(next_ptr) => match index {
+                0 => Some(next_ptr), // 返回自身
+                _ => self.get_ith_node_self(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
+            },
+        }
+    }
+
+    // 返回开始处节点的函数
+    pub fn get_node(&mut self, index: i32) -> Option<NonNull<Node<T>>> {
+        self.get_ith_node_self(self.start, index)
+    }
+
 	pub fn reverse(&mut self){
 		// TODO
+        // 反转链表->注意是对链表自身操作
+        for nega_index in 0..self.length {
+            let index:i32 = (self.length-1-nega_index) as i32;
+            if index>=1 {
+                // 此时可以正确指定
+                let current_node_ptr = self.get_node(index);
+                let former_node_ptr = self.get_node(index-1);
+                unsafe{(*current_node_ptr.unwrap().as_ptr()).next = former_node_ptr;}
+            } else {
+                let zero_node_ptr = self.get_node(index);
+                unsafe{(*zero_node_ptr.unwrap().as_ptr()).next = None;}
+            }
+        }
+        // 制定起始和终止
+        let ori_start = self.start;
+        let ori_end = self.end;
+        self.start = ori_end;
+        self.end = ori_start;
 	}
 }
 

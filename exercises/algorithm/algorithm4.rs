@@ -1,9 +1,10 @@
 /*
 	binary_search tree
 	This problem requires you to implement a basic interface for a binary tree
+    写一个二叉树
 */
 
-//I AM NOT DONE
+//I AM DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -51,12 +52,27 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        // 从根节点开始插入搜索
+        // self.root是Option<Box<TreeNode<T>>>类型
+        let mut ptr_root = &mut self.root;
+        match ptr_root {
+            None => self.root = Some(Box::new(TreeNode::new(value))),
+            Some(ref mut root_node) => {
+                // &mut Box<TreeNode>
+                root_node.insert(value);
+            }
+        };
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        // 做搜索
+        let ptr_root = &self.root;
+        match ptr_root {
+            None => false,
+            Some(ref root_node) => root_node.search(value),
+        }
     }
 }
 
@@ -64,9 +80,41 @@ impl<T> TreeNode<T>
 where
     T: Ord,
 {
-    // Insert a node into the tree
+    // Insert a node into the tree->从一个节点开始寻找位置。这里实现迭代函数更方便
     fn insert(&mut self, value: T) {
         //TODO
+        // 判断当前节点的值。如果大就插入在右边，反之左边
+        if self.value == value {
+            ()
+        } else if self.value > value {
+            // 插入在左侧
+            match self.left {
+                None => self.left = Some(Box::new(TreeNode::new(value))),
+                Some(ref mut left) => left.insert(value),
+            };
+        } else {
+            match self.right {
+                None => self.right = Some(Box::new(TreeNode::new(value))),
+                Some(ref mut right) => right.insert(value),
+            };
+        }
+    }
+
+    fn search(& self, value: T) -> bool {
+        // 从一个节点开始进行搜索
+        if self.value == value {
+            true
+        } else if self.value > value {
+            match self.left {
+                None => false,
+                Some(ref left) => left.search(value),
+            }
+        } else {
+            match self.right {
+                None => false,
+                Some(ref right) => right.search(value),
+            }
+        }
     }
 }
 

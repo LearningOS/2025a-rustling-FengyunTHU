@@ -1,12 +1,34 @@
 /*
 	sort
 	This problem requires you to implement a sorting algorithm
-	you can use bubble sorting, insertion sorting, heap sorting, etc.
+	you can use bubble sorting, insertion sorting, heap sorting, etc.// 排序算法
 */
-// I AM NOT DONE
+// I AM DONE
 
-fn sort<T>(array: &mut [T]){
+fn sort<T>(array: &mut [T]) where T:PartialOrd+PartialEq { // 添加泛型限制
 	//TODO
+    // 使用冒泡排序的方式
+    loop {
+        let mut Target:bool = false; // 决定要不要迭代
+        // 只要存在一次的交换则置为true，为false则没问题
+        if array.len() == 1 {
+            break;
+        } else {
+            for index in 0..array.len()-1 {
+                let left_num:&T = &array[index];
+                let right_num:&T = &array[index+1];
+                if left_num>right_num {
+                    // 进行交换->使用swap不需要泛型特征
+                    array.swap(index,index+1);
+                    Target = true; // 标记为交换过
+                }
+            }
+            // 全部交换完毕
+            if !Target {
+                break;
+            }
+        }
+    }
 }
 #[cfg(test)]
 mod tests {
